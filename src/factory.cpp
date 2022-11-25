@@ -138,11 +138,18 @@ waybar::AModule* waybar::Factory::makeModule(const std::string& name) const {
       return new waybar::modules::JACK(id, config_[name]);
     }
 #endif
+#ifdef HAVE_LIBWIREPLUMBER
+    if (ref == "wireplumber") {
+      return new waybar::modules::Wireplumber(id, config_[name]);
+    }
+#endif
     if (ref == "temperature") {
       return new waybar::modules::Temperature(id, config_[name]);
     }
     if (ref.compare(0, 7, "custom/") == 0 && ref.size() > 7) {
       return new waybar::modules::Custom(ref.substr(7), id, config_[name]);
+    } else if (ref.compare(0, 6, "image/") == 0 && ref.size() > 6) {
+      return new waybar::modules::Image(ref.substr(6), id, config_[name]);
     }
   } catch (const std::exception& e) {
     auto err = fmt::format("Disabling module \"{}\", {}", name, e.what());

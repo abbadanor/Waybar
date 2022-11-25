@@ -1,6 +1,6 @@
 project(
     'waybar', 'cpp', 'c',
-    version: '0.9.15',
+    version: '0.9.16',
     license: 'MIT',
     meson_version: '>= 0.49.0',
     default_options : [
@@ -101,6 +101,7 @@ libevdev = dependency('libevdev', required: get_option('libevdev'))
 libmpdclient = dependency('libmpdclient', required: get_option('mpd'))
 xkbregistry = dependency('xkbregistry')
 libjack = dependency('jack', required: get_option('jack'))
+libwireplumber = dependency('wireplumber-0.4', required: get_option('wireplumber'))
 
 libsndio = compiler.find_library('sndio', required: get_option('sndio'))
 if libsndio.found()
@@ -145,12 +146,12 @@ endif
 src_files = files(
     'src/factory.cpp',
     'src/AModule.cpp',
-    'src/AButton.cpp',
     'src/ALabel.cpp',
     'src/AIconLabel.cpp',
     'src/modules/custom.cpp',
     'src/modules/disk.cpp',
     'src/modules/idle_inhibitor.cpp',
+    'src/modules/image.cpp',
     'src/modules/temperature.cpp',
     'src/modules/user.cpp',
     'src/main.cpp',
@@ -247,6 +248,11 @@ if libjack.found()
     src_files += 'src/modules/jack.cpp'
 endif
 
+if libwireplumber.found()
+    add_project_arguments('-DHAVE_LIBWIREPLUMBER', language: 'cpp')
+    src_files += 'src/modules/wireplumber.cpp'
+endif
+
 if dbusmenu_gtk.found()
     add_project_arguments('-DHAVE_DBUSMENU', language: 'cpp')
     src_files += files(
@@ -330,6 +336,7 @@ executable(
         upower_glib,
         libpulse,
         libjack,
+        libwireplumber,
         libudev,
         libinotify,
         libepoll,
